@@ -1,0 +1,502 @@
+import { useState, useEffect } from "react";
+
+const questions = [
+  {
+    id: 1,
+    category: "எண்ணம் (Thoughts)",
+    question: "காலையில் எழுந்திருக்கும்போது உங்கள் முதல் எண்ணம் என்ன?",
+    options: [
+      { text: "இன்று என்ன நடக்குமோ என்று பயமாக இருக்கு", score: 1 },
+      { text: "சாதாரணமா இருக்கு, பெரிதா நினைக்கல", score: 2 },
+      { text: "இன்று ஏதாவது நல்லது நடக்கும் என்று நம்பிக்கையாக இருக்கு", score: 3 },
+      { text: "இன்று என் கனவை நோக்கி ஒரு அடி முன்னேறுவேன் என்று உற்சாகமாக இருக்கு", score: 4 },
+    ],
+  },
+  {
+    id: 2,
+    category: "தோல்வி (Failure)",
+    question: "ஒரு தோல்வி வந்தால் நீங்கள் என்ன செய்வீர்கள்?",
+    options: [
+      { text: "என்னால் முடியாது என்று விட்டுவிடுவேன்", score: 1 },
+      { text: "சோர்வாக இருக்கும், ஆனா நாளைக்கு பார்க்கலாம்", score: 2 },
+      { text: "என்ன தவறு நடந்தது என்று யோசிப்பேன்", score: 3 },
+      { text: "இது என் வளர்ச்சிக்கான பாடம் என்று உடனே திரும்புவேன்", score: 4 },
+    ],
+  },
+  {
+    id: 3,
+    category: "கனவு (Dream)",
+    question: "உங்கள் கனவைப் பற்றி யோசிக்கும்போது எப்படி உணர்கிறீர்கள்?",
+    options: [
+      { text: "என்னால் சாத்தியமில்லை என்று தோன்றுகிறது", score: 1 },
+      { text: "சாத்தியம்தான், ஆனா எப்போது நடக்கும் தெரியல", score: 2 },
+      { text: "நான் முயற்சி செய்தால் நடக்கும் என்று நம்புகிறேன்", score: 3 },
+      { text: "அது நடந்துவிட்டது போல் உணர்கிறேன், வழி தெரிகிறது", score: 4 },
+    ],
+  },
+  {
+    id: 4,
+    category: "செயல் (Action)",
+    question: "உங்கள் இலக்கை நோக்கி தினமும் என்ன செய்கிறீர்கள்?",
+    options: [
+      { text: "ஒன்றும் செய்வதில்லை, தயாரில்லை என்று தோன்றுகிறது", score: 1 },
+      { text: "சில நாட்கள் செய்கிறேன், சில நாட்கள் மறந்துவிடுகிறேன்", score: 2 },
+      { text: "வாரம் 3-4 நாட்கள் செய்கிறேன்", score: 3 },
+      { text: "தினமும் ஒரு சின்ன அடியாவது எடுத்து வைக்கிறேன்", score: 4 },
+    ],
+  },
+  {
+    id: 5,
+    category: "நன்றி (Gratitude)",
+    question: "இன்று உங்கள் வாழ்க்கையில் நன்றி சொல்ல என்ன இருக்கிறது என்று கேட்டால்?",
+    options: [
+      { text: "எனக்கு எதுவும் நல்லதாக இல்லை", score: 1 },
+      { text: "சில நேரம் நன்றி உணர்கிறேன், சில நேரம் இல்லை", score: 2 },
+      { text: "உடல்நலம், குடும்பம் என்று சொல்லலாம்", score: 3 },
+      { text: "உடனே 5-10 விஷயங்கள் நினைவுக்கு வருகின்றன", score: 4 },
+    ],
+  },
+  {
+    id: 6,
+    category: "நம்பிக்கை (Belief)",
+    question: "நீங்கள் நினைத்ததை அடைய தகுதியுள்ளவரா என்று கேட்டால்?",
+    options: [
+      { text: "இல்லை, நான் சாதாரண மனிதன்/மனிதி", score: 1 },
+      { text: "தெரியல, ஒருவேளை முடியும்", score: 2 },
+      { text: "ஆமா, நான் முயற்சி செய்தால் நிச்சயம் முடியும்", score: 3 },
+      { text: "நான் பிறந்தே அதற்கு தகுதியானவன்/தகுதியானவள்", score: 4 },
+    ],
+  },
+  {
+    id: 7,
+    category: "சுற்றுப்புறம் (Environment)",
+    question: "உங்கள் நண்பர்கள் / குடும்பம் உங்கள் கனவை பற்றி என்ன சொல்கிறார்கள்?",
+    options: [
+      { text: "எல்லாரும் சாத்தியமில்லை என்று சொல்கிறார்கள், நம்பிவிடுகிறேன்", score: 1 },
+      { text: "அவர்கள் கருத்து என்னை சில நேரம் தடுக்கிறது", score: 2 },
+      { text: "அவர்கள் கருத்தை கேட்கிறேன் ஆனா என் முடிவு என்னுடையதே", score: 3 },
+      { text: "என் நம்பிக்கை என் சக்தி, யாரும் மாற்ற முடியாது", score: 4 },
+    ],
+  },
+  {
+    id: 8,
+    category: "அடையாளம் (Identity)",
+    question: "நீங்கள் யாரென்று உங்களுக்கு தெரியுமா?",
+    options: [
+      { text: "என்னால் என்னை புரிந்துகொள்ள முடியவில்லை", score: 1 },
+      { text: "சில நேரம் தெளிவாக இருக்கும், சில நேரம் குழப்பமாக இருக்கும்", score: 2 },
+      { text: "என் மதிப்புகளும் இலக்கும் எனக்கு தெரியும்", score: 3 },
+      { text: "நான் என்னை முழுமையாக ஏற்று, என் தனித்தன்மையோடு வாழுகிறேன்", score: 4 },
+    ],
+  },
+];
+
+const getResult = (score) => {
+  const pct = (score / 32) * 100;
+  if (pct <= 35) return {
+    level: "விதை நிலை",
+    emoji: "🌱",
+    subtitle: "Seed Stage",
+    color: "#e85d5d",
+    desc: "உங்கள் மனம் இன்னும் விழிப்படையவில்லை. பயம் மற்றும் சந்தேகம் உங்களை தடுக்கிறது. ஆனால் விதைக்கு அடிக்கு தண்ணீர் கொடுத்தால் மரம் ஆகும் — அதுபோல் உங்களுக்கும் சரியான வழிகாட்டல் கிடைத்தால் மாற்றம் நிச்சயம்.",
+    action: "90 நாள் transformation program உங்களுக்காகவே உருவாக்கப்பட்டது. இன்றே தொடங்குங்கள்.",
+  };
+  if (pct <= 55) return {
+    level: "கிளை நிலை",
+    emoji: "🌿",
+    subtitle: "Sprout Stage",
+    color: "#f5a623",
+    desc: "நீங்கள் விழிக்கத் தொடங்கியுள்ளீர்கள். நம்பிக்கையும் சந்தேகமும் சேர்ந்து போகிறது. இந்த நேரம் மிக முக்கியம் — சரியான mindset tools கிடைத்தால் நீங்கள் வேகமாக வளரலாம்.",
+    action: "உங்கள் மனசை next level க்கு எடுத்துச் செல்ல coaching எடுங்கள். One decision தான் life மாற்றும்!",
+  };
+  if (pct <= 75) return {
+    level: "மலர் நிலை",
+    emoji: "🌸",
+    subtitle: "Blossom Stage",
+    color: "#7b61ff",
+    desc: "மிகவும் நல்லது! உங்கள் mindset வலுவாக இருக்கிறது. நம்பிக்கையும் செயலும் இணைந்திருக்கின்றன. சிறிய adjustments செய்தால் நீங்கள் முழு bloom ஆவீர்கள்.",
+    action: "Advanced manifestation techniques மற்றும் accountability உங்களுக்கு அடுத்த quantum leap தரும்.",
+  };
+  return {
+    level: "பூரண நிலை",
+    emoji: "🌟",
+    subtitle: "Full Bloom Stage",
+    color: "#00c896",
+    desc: "நீங்கள் ஒரு powerful manifestor! உங்கள் மனம் abundance இல் இயங்குகிறது. இப்போது உங்கள் சக்தியை பிறருக்கும் கொடுங்கள் — உங்கள் கதை பலருக்கு ஒளி தரும்.",
+    action: "உங்கள் transformation journey ஐ share பண்ணுங்கள். நீங்கள் ஒரு inspiration!",
+  };
+};
+
+export default function MindsetApp() {
+  const [screen, setScreen] = useState("intro"); // intro | quiz | result
+  const [current, setCurrent] = useState(0);
+  const [answers, setAnswers] = useState([]);
+  const [selected, setSelected] = useState(null);
+  const [animating, setAnimating] = useState(false);
+  const [name, setName] = useState("");
+  const [nameInput, setNameInput] = useState("");
+
+  const totalScore = answers.reduce((a, b) => a + b, 0);
+  const result = getResult(totalScore);
+  const progress = ((current) / questions.length) * 100;
+
+  const handleStart = () => {
+    if (!nameInput.trim()) return;
+    setName(nameInput.trim());
+    setScreen("quiz");
+  };
+
+  const handleSelect = (score) => {
+    setSelected(score);
+  };
+
+  const handleNext = () => {
+    if (selected === null) return;
+    setAnimating(true);
+    setTimeout(() => {
+      const newAnswers = [...answers, selected];
+      setAnswers(newAnswers);
+      setSelected(null);
+      if (current + 1 >= questions.length) {
+        setScreen("result");
+      } else {
+        setCurrent(current + 1);
+      }
+      setAnimating(false);
+    }, 300);
+  };
+
+  const handleRestart = () => {
+    setScreen("intro");
+    setCurrent(0);
+    setAnswers([]);
+    setSelected(null);
+    setName("");
+    setNameInput("");
+  };
+
+  const pct = Math.round((totalScore / 32) * 100);
+
+  return (
+    <div style={{
+      minHeight: "100vh",
+      background: "linear-gradient(135deg, #0a0a1a 0%, #12102b 50%, #0d1a2e 100%)",
+      fontFamily: "'Noto Sans Tamil', 'Segoe UI', sans-serif",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: "20px",
+      position: "relative",
+      overflow: "hidden",
+    }}>
+      {/* Background orbs */}
+      <div style={{
+        position: "fixed", top: "-20%", right: "-10%",
+        width: "500px", height: "500px", borderRadius: "50%",
+        background: "radial-gradient(circle, rgba(123,97,255,0.15) 0%, transparent 70%)",
+        pointerEvents: "none",
+      }} />
+      <div style={{
+        position: "fixed", bottom: "-10%", left: "-10%",
+        width: "400px", height: "400px", borderRadius: "50%",
+        background: "radial-gradient(circle, rgba(0,200,150,0.1) 0%, transparent 70%)",
+        pointerEvents: "none",
+      }} />
+
+      <div style={{ width: "100%", maxWidth: "560px", position: "relative", zIndex: 1 }}>
+
+        {/* INTRO SCREEN */}
+        {screen === "intro" && (
+          <div style={{ textAlign: "center", animation: "fadeUp 0.6s ease" }}>
+            <div style={{
+              fontSize: "13px", letterSpacing: "4px", color: "#7b61ff",
+              textTransform: "uppercase", marginBottom: "16px", fontWeight: 600,
+            }}>manifest.with.you</div>
+
+            <div style={{ fontSize: "52px", marginBottom: "8px" }}>🧠✨</div>
+
+            <h1 style={{
+              fontSize: "clamp(26px, 5vw, 36px)", fontWeight: 800,
+              background: "linear-gradient(135deg, #fff 0%, #b8a9ff 100%)",
+              WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+              marginBottom: "8px", lineHeight: 1.2,
+            }}>
+              உங்கள் மனசு எந்த நிலையில் இருக்கிறது?
+            </h1>
+
+            <p style={{ color: "rgba(255,255,255,0.55)", fontSize: "14px", marginBottom: "32px", lineHeight: 1.7 }}>
+              8 கேள்விகள் மூலம் உங்கள் mindset level கண்டறியுங்கள்.<br />
+              <span style={{ color: "#7b61ff" }}>One Decision. 90 Days. New Life!</span>
+            </p>
+
+            <div style={{
+              background: "rgba(255,255,255,0.04)",
+              border: "1px solid rgba(255,255,255,0.1)",
+              borderRadius: "20px", padding: "28px", marginBottom: "24px",
+            }}>
+              <label style={{ display: "block", color: "rgba(255,255,255,0.7)", fontSize: "14px", marginBottom: "12px", textAlign: "left" }}>
+                உங்கள் பெயர் என்ன?
+              </label>
+              <input
+                value={nameInput}
+                onChange={e => setNameInput(e.target.value)}
+                onKeyDown={e => e.key === "Enter" && handleStart()}
+                placeholder="உங்கள் பெயரை எழுதுங்கள்..."
+                style={{
+                  width: "100%", padding: "14px 16px", borderRadius: "12px",
+                  background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.15)",
+                  color: "#fff", fontSize: "16px", outline: "none", boxSizing: "border-box",
+                  fontFamily: "inherit",
+                }}
+              />
+            </div>
+
+            <button onClick={handleStart} style={{
+              width: "100%", padding: "16px", borderRadius: "14px",
+              background: nameInput.trim() ? "linear-gradient(135deg, #7b61ff, #5a3fe8)" : "rgba(255,255,255,0.1)",
+              color: "#fff", fontSize: "17px", fontWeight: 700, border: "none",
+              cursor: nameInput.trim() ? "pointer" : "not-allowed",
+              transition: "all 0.3s", letterSpacing: "0.5px",
+              fontFamily: "inherit",
+            }}>
+              தொடங்குங்கள் →
+            </button>
+
+            <p style={{ color: "rgba(255,255,255,0.3)", fontSize: "12px", marginTop: "16px" }}>
+              By Gopinath | @manifest.with.you
+            </p>
+          </div>
+        )}
+
+        {/* QUIZ SCREEN */}
+        {screen === "quiz" && (
+          <div style={{ animation: animating ? "fadeOut 0.3s ease" : "fadeUp 0.4s ease" }}>
+            {/* Header */}
+            <div style={{ marginBottom: "24px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
+                <span style={{ color: "rgba(255,255,255,0.4)", fontSize: "13px" }}>
+                  {current + 1} / {questions.length}
+                </span>
+                <span style={{
+                  background: "rgba(123,97,255,0.2)", color: "#b8a9ff",
+                  padding: "4px 12px", borderRadius: "20px", fontSize: "12px", fontWeight: 600,
+                }}>
+                  {questions[current].category}
+                </span>
+              </div>
+              <div style={{
+                height: "4px", background: "rgba(255,255,255,0.08)", borderRadius: "2px", overflow: "hidden",
+              }}>
+                <div style={{
+                  height: "100%", width: `${((current) / questions.length) * 100}%`,
+                  background: "linear-gradient(90deg, #7b61ff, #00c896)",
+                  borderRadius: "2px", transition: "width 0.5s ease",
+                }} />
+              </div>
+            </div>
+
+            {/* Question */}
+            <div style={{
+              background: "rgba(255,255,255,0.04)",
+              border: "1px solid rgba(255,255,255,0.08)",
+              borderRadius: "20px", padding: "24px", marginBottom: "20px",
+            }}>
+              <p style={{
+                color: "#fff", fontSize: "clamp(16px, 3vw, 19px)",
+                fontWeight: 600, lineHeight: 1.6, margin: 0,
+              }}>
+                {questions[current].question}
+              </p>
+            </div>
+
+            {/* Options */}
+            <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginBottom: "24px" }}>
+              {questions[current].options.map((opt, i) => {
+                const isSelected = selected === opt.score;
+                return (
+                  <button key={i} onClick={() => handleSelect(opt.score)} style={{
+                    padding: "15px 18px", borderRadius: "14px", textAlign: "left",
+                    background: isSelected
+                      ? "linear-gradient(135deg, rgba(123,97,255,0.3), rgba(90,63,232,0.2))"
+                      : "rgba(255,255,255,0.04)",
+                    border: isSelected
+                      ? "1px solid rgba(123,97,255,0.7)"
+                      : "1px solid rgba(255,255,255,0.08)",
+                    color: isSelected ? "#fff" : "rgba(255,255,255,0.75)",
+                    fontSize: "14px", lineHeight: 1.5, cursor: "pointer",
+                    transition: "all 0.2s", fontFamily: "inherit",
+                    transform: isSelected ? "scale(1.01)" : "scale(1)",
+                  }}>
+                    <span style={{
+                      display: "inline-block", width: "22px", height: "22px",
+                      borderRadius: "50%", border: isSelected ? "2px solid #7b61ff" : "2px solid rgba(255,255,255,0.2)",
+                      marginRight: "12px", verticalAlign: "middle",
+                      background: isSelected ? "#7b61ff" : "transparent",
+                      position: "relative", top: "-1px",
+                      transition: "all 0.2s", flexShrink: 0,
+                    }} />
+                    {opt.text}
+                  </button>
+                );
+              })}
+            </div>
+
+            <button onClick={handleNext} style={{
+              width: "100%", padding: "15px", borderRadius: "14px",
+              background: selected !== null
+                ? "linear-gradient(135deg, #7b61ff, #5a3fe8)"
+                : "rgba(255,255,255,0.06)",
+              color: selected !== null ? "#fff" : "rgba(255,255,255,0.3)",
+              fontSize: "16px", fontWeight: 700, border: "none",
+              cursor: selected !== null ? "pointer" : "not-allowed",
+              transition: "all 0.3s", fontFamily: "inherit",
+            }}>
+              {current + 1 === questions.length ? "முடிவு காண்க →" : "அடுத்த கேள்வி →"}
+            </button>
+          </div>
+        )}
+
+        {/* RESULT SCREEN */}
+        {screen === "result" && (
+          <div style={{ animation: "fadeUp 0.6s ease" }}>
+            {/* Brand header */}
+            <div style={{ textAlign: "center", marginBottom: "24px" }}>
+              <div style={{ fontSize: "11px", letterSpacing: "4px", color: "#7b61ff", marginBottom: "4px" }}>
+                manifest.with.you
+              </div>
+              <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.4)" }}>
+                Mindset Assessment Results
+              </div>
+            </div>
+
+            {/* Score card */}
+            <div style={{
+              background: "rgba(255,255,255,0.04)",
+              border: `1px solid ${result.color}40`,
+              borderRadius: "24px", padding: "32px", textAlign: "center", marginBottom: "20px",
+              boxShadow: `0 0 60px ${result.color}20`,
+            }}>
+              <div style={{ fontSize: "56px", marginBottom: "8px" }}>{result.emoji}</div>
+              <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.4)", letterSpacing: "2px", marginBottom: "4px" }}>
+                {name} — உங்கள் நிலை
+              </div>
+              <h2 style={{
+                fontSize: "28px", fontWeight: 800, color: result.color,
+                marginBottom: "4px",
+              }}>
+                {result.level}
+              </h2>
+              <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.4)", marginBottom: "20px" }}>
+                {result.subtitle}
+              </div>
+
+              {/* Score bar */}
+              <div style={{ marginBottom: "8px" }}>
+                <div style={{
+                  height: "10px", background: "rgba(255,255,255,0.08)",
+                  borderRadius: "5px", overflow: "hidden",
+                }}>
+                  <div style={{
+                    height: "100%", width: `${pct}%`,
+                    background: `linear-gradient(90deg, ${result.color}80, ${result.color})`,
+                    borderRadius: "5px",
+                    transition: "width 1.5s ease",
+                  }} />
+                </div>
+                <div style={{ textAlign: "right", color: result.color, fontSize: "13px", marginTop: "6px", fontWeight: 700 }}>
+                  {pct}% — {totalScore}/32
+                </div>
+              </div>
+            </div>
+
+            {/* Description */}
+            <div style={{
+              background: "rgba(255,255,255,0.03)",
+              border: "1px solid rgba(255,255,255,0.07)",
+              borderRadius: "18px", padding: "20px", marginBottom: "16px",
+            }}>
+              <p style={{ color: "rgba(255,255,255,0.8)", fontSize: "14px", lineHeight: 1.8, margin: 0 }}>
+                {result.desc}
+              </p>
+            </div>
+
+            {/* Call to action */}
+            <div style={{
+              background: `linear-gradient(135deg, ${result.color}20, ${result.color}08)`,
+              border: `1px solid ${result.color}40`,
+              borderRadius: "18px", padding: "20px", marginBottom: "20px",
+            }}>
+              <div style={{ fontSize: "12px", color: result.color, letterSpacing: "2px", marginBottom: "8px", fontWeight: 700 }}>
+                ✨ NEXT STEP
+              </div>
+              <p style={{ color: "rgba(255,255,255,0.85)", fontSize: "14px", lineHeight: 1.7, margin: 0 }}>
+                {result.action}
+              </p>
+            </div>
+
+            {/* Category breakdown */}
+            <div style={{
+              background: "rgba(255,255,255,0.03)",
+              border: "1px solid rgba(255,255,255,0.07)",
+              borderRadius: "18px", padding: "20px", marginBottom: "20px",
+            }}>
+              <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", letterSpacing: "2px", marginBottom: "14px" }}>
+                CATEGORY BREAKDOWN
+              </div>
+              {questions.map((q, i) => {
+                const ans = answers[i] || 0;
+                const barPct = (ans / 4) * 100;
+                return (
+                  <div key={i} style={{ marginBottom: "10px" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
+                      <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.6)" }}>{q.category}</span>
+                      <span style={{ fontSize: "12px", color: result.color, fontWeight: 600 }}>{ans}/4</span>
+                    </div>
+                    <div style={{ height: "5px", background: "rgba(255,255,255,0.06)", borderRadius: "3px" }}>
+                      <div style={{
+                        height: "100%", width: `${barPct}%`,
+                        background: result.color, borderRadius: "3px",
+                      }} />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Footer buttons */}
+            <button onClick={handleRestart} style={{
+              width: "100%", padding: "15px", borderRadius: "14px",
+              background: "rgba(255,255,255,0.07)",
+              color: "rgba(255,255,255,0.7)", fontSize: "15px", fontWeight: 600,
+              border: "1px solid rgba(255,255,255,0.1)", cursor: "pointer",
+              fontFamily: "inherit", marginBottom: "16px",
+            }}>
+              மீண்டும் எடுக்க
+            </button>
+
+            <div style={{ textAlign: "center" }}>
+              <p style={{ color: "rgba(255,255,255,0.3)", fontSize: "12px" }}>
+                @manifest.with.you | One Decision. 90 Days. New Life!
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@400;600;700;800&display=swap');
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeOut {
+          from { opacity: 1; transform: translateY(0); }
+          to { opacity: 0; transform: translateY(-10px); }
+        }
+        * { box-sizing: border-box; }
+        input::placeholder { color: rgba(255,255,255,0.3); font-family: inherit; }
+        button:hover { opacity: 0.9; }
+      `}</style>
+    </div>
+  );
+}
